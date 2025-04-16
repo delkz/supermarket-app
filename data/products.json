@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "id": "28ca2922-abe6-45e6-9df1-c6fa163f6caa",
+    "name": "Leite Integral",
+    "price": 6.5,
+    "description": "1L, integral",
+    "image": "",
+    "brandId": "1f41b73c-d1de-4d02-9c9c-0c5a4b2a39b5"
+  },
+  {
+    "id": "e490f1d5-1fbf-4a08-8217-87faacf3b663",
+    "name": "Coca-Cola Lata",
+    "price": 3.5,
+    "description": "Refrigerante Coca-Cola 350ml",
+    "image": "",
+    "brandId": "5b1c58e0-b409-4ff8-b6b6-1fae2f59dd48"
+  },
+  {
+    "id": "2acf47b9-c695-4288-bf81-a7f34730bce4",
+    "name": "Pepsi 2L",
+    "price": 7,
+    "description": "Refrigerante Pepsi Garrafa 2L",
+    "image": "",
+    "brandId": "8c3b3f6e-7d56-4c09-a95e-1c58f3b27d44"
+  },
+  {
+    "id": "942ebf24-e81f-4f2d-a4aa-78bd73aedda0",
+    "name": "Nescau Pronto",
+    "price": 4.2,
+    "description": "Achocolatado pronto para beber 200ml",
+    "image": "",
+    "brandId": "1f41b73c-d1de-4d02-9c9c-0c5a4b2a39b5"
+  },
+  {
+    "id": "2c23aa1f-cc02-4575-b7ec-64395cf2ed05",
+    "name": "Coca-Cola Zero 600ml",
+    "price": 5.8,
+    "description": "Refrigerante Coca-Cola Zero 600ml",
+    "image": "",
+    "brandId": "5b1c58e0-b409-4ff8-b6b6-1fae2f59dd48"
+  }
+]

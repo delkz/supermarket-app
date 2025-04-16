@@ -20,6 +20,10 @@ export async function GET(request: NextRequest) {
 
         const searchParams = new URL(request.url).searchParams
         const nameFilter = searchParams.get('name')?.toLowerCase()
+        const page = parseInt(searchParams.get('page') || '1')
+        const limit = parseInt(searchParams.get('limit') || '10')
+        const start = (page - 1) * limit
+        const end = start + limit
 
         let filteredProducts = products
 
@@ -27,7 +31,9 @@ export async function GET(request: NextRequest) {
             filteredProducts = products.filter(product => product.name.toLowerCase().includes(nameFilter))
         }
 
-        const result = filteredProducts.map(product => {
+        const paginated = filteredProducts.slice(start, end)
+
+        const result = paginated.map(product => {
             const brand = brands.find(brand => brand.id === product.brandId)
             return {
                 ...product,
@@ -36,7 +42,13 @@ export async function GET(request: NextRequest) {
             }
         })
 
-        return NextResponse.json(result)
+        return NextResponse.json({
+            data: result,
+            total: filteredProducts.length,
+            page,
+            limit,
+            hasNextPage: end < filteredProducts.length
+          })
 
 
     } catch (error) {
