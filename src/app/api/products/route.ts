@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         const brands: Brand[] = JSON.parse(brandsData)
 
         const searchParams = new URL(request.url).searchParams
-        const nameFilter = searchParams.get('name')?.toLowerCase()
+        const search = searchParams.get('search')?.toLowerCase()
         const page = parseInt(searchParams.get('page') || '1')
         const limit = parseInt(searchParams.get('limit') || '10')
         const start = (page - 1) * limit
@@ -27,9 +27,16 @@ export async function GET(request: NextRequest) {
 
         let filteredProducts = products
 
-        if (nameFilter) {
-            filteredProducts = products.filter(product => product.name.toLowerCase().includes(nameFilter))
-        }
+        if (search) {
+            filteredProducts = products.filter((product) => {
+              const brand = brands.find((b) => b.id === product.brandId)
+              return (
+                product.name.toLowerCase().includes(search) ||
+                (product.description?.toLowerCase().includes(search) ?? false) ||
+                (brand?.name.toLowerCase().includes(search) ?? false)
+              )
+            })
+          }
 
         const paginated = filteredProducts.slice(start, end)
 
