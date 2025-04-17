@@ -5,7 +5,7 @@ import { Brand } from '@/types';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         const brandsPath = path.resolve(process.cwd(), 'src/data', 'brands.json');
         const brandsData = await fs.readFile(brandsPath, 'utf-8');
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
 
         const { name } = body;
@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         const brandsPath = path.resolve(process.cwd(), 'src/data', 'brands.json');
         const brandsData = await fs.readFile(brandsPath, 'utf-8');
