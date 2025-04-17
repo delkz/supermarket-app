@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 export async function GET(request: NextRequest) {
     try {
-        const productsPath = path.join(process.cwd(), 'data', 'products.json')
-        const brandsPath = path.join(process.cwd(), 'data', 'brands.json')
+        const productsPath = path.resolve(process.cwd(), 'src/data', 'products.json')
+        const brandsPath = path.resolve(process.cwd(), 'src/data', 'brands.json')
 
         const [productsData, brandsData] = await Promise.all([
             fs.readFile(productsPath, 'utf-8'),
@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: 'Preço deve ser maior que 0' }, { status: 400 })
         }
 
-        const brandsPath = path.join(process.cwd(), 'data', 'brands.json')
-        const productsPath = path.join(process.cwd(), 'data', 'products.json')
+        const brandsPath = path.resolve(process.cwd(), 'src/data', 'brands.json')
+        const productsPath = path.resolve(process.cwd(), 'src/data', 'products.json')
 
         const [brandsData, productsData] = await Promise.all([
             fs.readFile(brandsPath, 'utf-8'),

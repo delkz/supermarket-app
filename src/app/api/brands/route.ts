@@ -5,7 +5,7 @@ import { Brand } from '@/types'
 
 export async function GET(req: NextRequest){
     try{
-        const filepath = path.join(process.cwd(),'data','brands.json');
+        const filepath = path.resolve(process.cwd(), 'src/data', 'brands.json');
         const data = await fs.readFile(filepath,'utf-8');
         const brands: Brand[] = JSON.parse(data);
 
