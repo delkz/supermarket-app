@@ -15,8 +15,8 @@ export default function ProductTable({ products }: Props) {
           <tr>
             <th>Imagem</th>
             <th>Nome</th>
-            <th>Descrição</th>
-            <th>Marca</th>
+            <th className='hidden md:table-cell'>Descrição</th>
+            <th className='hidden sm:table-cell'>Marca</th>
             <th>Preço</th>
           </tr>
         </thead>
@@ -26,17 +26,20 @@ export default function ProductTable({ products }: Props) {
               <td>
                 {product.image ? (
                   <Image
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded"
+                  src={product.image}
+                  alt={product.name}
+                  className="w-16 h-16 object-scale-down rounded bg-white"
+                  unoptimized
+                  width={16}
+                  height={16}
                   />
                 ) : (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-gray-400"></span>
                 )}
               </td>
               <td>{product.name}</td>
-              <td>{product.description || '—'}</td>
-              <td>{product.brand?.name || '—'}</td>
+              <td className='hidden md:table-cell'><p className='line-clamp-2'>{product.description || '—'}</p></td>
+              <td className='hidden sm:table-cell'>{product.brand?.name || '—'}</td>
               <td>R$ {product.price.toFixed(2)}</td>
             </tr>
           ))}

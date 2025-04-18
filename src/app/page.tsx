@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import ProductTable from '@/components/ProductTable'
 import { Product } from '@/types'
+import Link from 'next/link'
 
 interface requestParams {
   data: Product[],
@@ -14,7 +15,7 @@ interface requestParams {
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
   const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [hasNextPage, setHasNextPage] = useState(false)
 
@@ -31,7 +32,7 @@ export default function Home() {
     const params = new URLSearchParams({
       search: search || '',
       page: pageNumber.toString(),
-      limit: '5'
+      limit: '10'
     }).toString()
     const res = await fetch(`/api/products?${params}`)
     const { data, hasNextPage, page }: requestParams = await res.json()
@@ -57,7 +58,7 @@ export default function Home() {
     <main className="p-6">
       <h1 className="text-3xl font-bold mb-6">📦 Lista de Produtos</h1>
 
-      <div className="form-control mb-6 w-full max-w-sm">
+      <div className="form-control mb-6 w-full max-w-sm flex gap-5">
         <input
           type="text"
           placeholder="Buscar por nome, descrição ou marca..."
@@ -65,10 +66,12 @@ export default function Home() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-      </div>
 
+        <Link href="/product/register" className='btn btn-primary'>Novo produto</Link>
+      </div>
+    
       {loading ? (
-        <div className="text-center text-gray-500">Carregando produtos...</div>
+        <div className="text-center text-gray-500 skeleton h-64 w-full"></div>
       ) : (
         <ProductTable products={products} />
       )}
