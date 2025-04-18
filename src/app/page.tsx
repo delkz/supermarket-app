@@ -28,11 +28,11 @@ export default function Home() {
   }
 
   const fetchProducts = async (pageNumber = 1) => {
-    setLoading(true)
+    // setLoading(true)
     const params = new URLSearchParams({
       search: search || '',
       page: pageNumber.toString(),
-      limit: '10'
+      limit: '6'
     }).toString()
     const res = await fetch(`/api/products?${params}`)
     const { data, hasNextPage, page }: requestParams = await res.json()
@@ -56,7 +56,7 @@ export default function Home() {
 
   return (
     <main className="p-6">
-      <h1 className="text-3xl font-bold mb-6">📦 Lista de Produtos</h1>
+      <h1 className="text-3xl font-bold mb-6">📃 Lista de Produtos</h1>
 
       <div className="form-control mb-6 w-full max-w-sm flex gap-5">
         <input

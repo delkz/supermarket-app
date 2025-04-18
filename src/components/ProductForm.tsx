@@ -2,11 +2,14 @@
 import { Product, Brand } from "@/types"
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import FormFeedback from "./FormFeedback";
 type FormValues = Product;
 
 export default function ProductForm() {
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
     const [brands,SetBrands] = useState<Brand[]>([]);
+    const [formState, setFormState] = useState<"idle" | "success" | "error">("idle");
+    const [formMessage, setFormMessage] = useState<string>("");
 
     useEffect(() => {
         const fetchBrands = async () => {
@@ -48,6 +51,15 @@ export default function ProductForm() {
 
         const r = await fetch('/api/products', requestOptions)
         const response = await r.json();
+
+        if (r.ok) {
+            setFormState("success");
+            setFormMessage("Produto cadastrado com sucesso!");
+        } else {
+            setFormState("error");
+            setFormMessage(response.message || "Ocorreu um erro ao cadastrar o produto.");
+        }
+
 
         console.log({response});
     };
@@ -99,7 +111,7 @@ export default function ProductForm() {
             </label>
             <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 className="file-input file-input-bordered w-full"
                 {...register("image", { required: "A imagem é obrigatória" })}
                 onChange={(e) => {
@@ -118,7 +130,14 @@ export default function ProductForm() {
             />
             {errors.image && <span className="text-error">{errors.image.message}</span>}
             <div className="mt-4">
-                <img id="image-preview" alt="Pré-visualização da imagem" className="w-full max-h-64 object-cover" />
+                <img 
+                    id="image-preview" 
+                    alt="Pré-visualização da imagem" 
+                    className="w-full h-64 object-scale-down bg-white" 
+                    style={{ display: "none" }} 
+                    onLoad={(e) => (e.currentTarget.style.display = "block")} 
+                    onError={(e) => (e.currentTarget.style.display = "none")} 
+                />
             </div>
         </div>
 
@@ -141,6 +160,9 @@ export default function ProductForm() {
         </div>
 
         <button type="submit" className="btn btn-primary w-full">Cadastrar</button>
+
+        {(formState !== "idle" && formMessage) &&  <FormFeedback text={formMessage} type={formState} />}
+
     </form>
     )
 }
