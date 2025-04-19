@@ -8,7 +8,7 @@ export default function RegisterPage() {
          <h1 className="text-3xl font-bold mb-6">📦 Cadastrar novo produto</h1>
         <div className="form-control mb-6 ">
    
-            <ProductForm />
+            <ProductForm method={"POST"} />
         </div>
     </main>
 }

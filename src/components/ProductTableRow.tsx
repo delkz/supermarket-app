@@ -2,6 +2,7 @@
 
 import { Product } from "@/types"
 import Image from "next/image"
+import Link from "next/link"
 import { memo } from "react"
 
 const ProductTableRow = memo(({ product }: { product: Product }) => {
@@ -25,6 +26,9 @@ const ProductTableRow = memo(({ product }: { product: Product }) => {
         <td className='hidden md:table-cell'><p className='line-clamp-2'>{product.description || '—'}</p></td>
         <td className='hidden sm:table-cell'>{product.brand?.name || '—'}</td>
         <td>R$ {product.price.toFixed(2)}</td>
+        <td>
+          <Link href={`/product/${product.id}`} className="btn btn-sm btn-block">Ver</Link>
+        </td>
       </tr>
     )
 })

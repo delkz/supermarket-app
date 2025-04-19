@@ -11,6 +11,10 @@ interface FormValues extends Omit<Product, 'image'> {
     image: FileList;
 }
   
+interface ProductFormProps {
+    method: "POST" | "PUT";
+    productId ?: string;
+}
 
 interface requestParams {
     data: Brand[];
@@ -19,7 +23,7 @@ interface requestParams {
     totalItems: number;
 }
 
-export default function ProductForm() {
+export default function ProductForm({method,productId}:ProductFormProps) {
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
     const [brands, setBrands] = useState<Brand[]>([]);
     const [formState, setFormState] = useState<"idle" | "success" | "error">("idle");
@@ -28,6 +32,24 @@ export default function ProductForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
+        
+        const fetchProduct = async ()=>{
+            try {
+                const res = await fetch(`/api/products/${productId}`);
+                const product: Product = await res.json();
+                reset({
+                    name: product.name,
+                    brandId: product.brandId,
+                    description: product.description,
+                    price: product.price,
+                    image: undefined, // Não preenchemos a imagem aqui
+                });
+                setImagePreview(product.image || null); // Preenchemos a imagem aqui para visualização
+            } catch (error) {
+                console.error("Erro ao buscar produto", error);
+            }
+        }
+
         const fetchBrands = async () => {
             try {
                 const res = await fetch(`/api/brands?page=1&limit=999`);
@@ -39,10 +61,19 @@ export default function ProductForm() {
         };
 
         fetchBrands();
+
+        if (method === "PUT" && productId) {
+            fetchProduct();
+        }
     }, []);
 
 
+
+
+
     const onSubmit: SubmitHandler<FormValues> = async (values) => {
+
+       
         setIsSubmitting(true);
         const { name, brandId, description, price, image } = values;
 
@@ -60,11 +91,13 @@ export default function ProductForm() {
         const raw = JSON.stringify({ name, brandId, description, price, image: base64Image });
 
         const requestOptions = {
-            method: "POST",
+            method,
             body: raw,
         };
 
-        const r = await fetch('/api/products', requestOptions)
+        const url = method === "POST" ? '/api/products' : `/api/products/${productId}`;
+
+        const r = await fetch(url, requestOptions)
         const response = await r.json();
 
         setIsSubmitting(false);
@@ -78,7 +111,6 @@ export default function ProductForm() {
             setFormState("error");
             setFormMessage(response.message || "Ocorreu um erro ao cadastrar o produto.");
         }
-
 
         // console.log({ response });
     };
@@ -182,7 +214,7 @@ export default function ProductForm() {
             </div>
 
             <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Enviando..." : "Cadastrar"}
+                {isSubmitting ? "Enviando..." : (method === "POST" ? "Cadastrar" : "Atualizar")}
             </button>
 
             {(formState !== "idle" && formMessage) && <FormFeedback text={formMessage} type={formState} />}
