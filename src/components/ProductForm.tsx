@@ -8,7 +8,7 @@ import FormFeedback from "./FormFeedback";
 import { convertToBase64 } from "@/utils/convertToBase64";
 
 interface FormValues extends Omit<Product, 'image'> {
-    image: FileList;
+    image: FileList | string;
 }
   
 interface ProductFormProps {
@@ -32,7 +32,7 @@ export default function ProductForm({method,productId}:ProductFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        
+
         const fetchProduct = async ()=>{
             try {
                 const res = await fetch(`/api/products/${productId}`);
@@ -42,7 +42,7 @@ export default function ProductForm({method,productId}:ProductFormProps) {
                     brandId: product.brandId,
                     description: product.description,
                     price: product.price,
-                    image: undefined, // Não preenchemos a imagem aqui
+                    image: product.image,
                 });
                 setImagePreview(product.image || null); // Preenchemos a imagem aqui para visualização
             } catch (error) {
@@ -73,29 +73,37 @@ export default function ProductForm({method,productId}:ProductFormProps) {
 
     const onSubmit: SubmitHandler<FormValues> = async (values) => {
 
-       
+         const isPost = method === "POST";
         setIsSubmitting(true);
         const { name, brandId, description, price, image } = values;
 
-        if (!image || image.length === 0) {
+        let trueImage = image;
+
+        if(!isPost &&  (!image || image.length === 0)) {
+            trueImage = imagePreview || ""; // Se não houver nova imagem, mantenha a imagem atual
+        }   
+
+        if (isPost && (!image || image.length === 0)) {
             setFormState("error");
             setFormMessage("A imagem é obrigatória.");
             setIsSubmitting(false);
             return;
-          }
+        }
 
-        let base64Image = "";
-
-        const file = image[0];
-        base64Image = await convertToBase64(file);
-        const raw = JSON.stringify({ name, brandId, description, price, image: base64Image });
+        const raw = JSON.stringify({
+            name,
+            brandId,
+            description,
+            price,
+            image : trueImage instanceof FileList ? await convertToBase64(trueImage[0]) : trueImage,
+        });
 
         const requestOptions = {
             method,
             body: raw,
         };
 
-        const url = method === "POST" ? '/api/products' : `/api/products/${productId}`;
+        const url = isPost ? '/api/products' : `/api/products/${productId}`;
 
         const r = await fetch(url, requestOptions)
         const response = await r.json();
@@ -105,8 +113,20 @@ export default function ProductForm({method,productId}:ProductFormProps) {
         if (r.ok) {
             setFormState("success");
             setFormMessage("Produto cadastrado com sucesso!");
-            setImagePreview(null);
-            reset();
+        
+            reset({
+                name: !isPost ? name : "",
+                brandId:!isPost ? brandId : "",
+                description: !isPost ? description : "",
+                price: !isPost ? price : undefined,
+                image: !isPost ? trueImage : undefined,
+            });
+
+            if (isPost) {
+                setImagePreview(null);
+            }
+        
+            
         } else {
             setFormState("error");
             setFormMessage(response.message || "Ocorreu um erro ao cadastrar o produto.");
@@ -188,7 +208,7 @@ export default function ProductForm({method,productId}:ProductFormProps) {
                             type="file"
                             accept="image/jpeg,image/png,image/webp"
                             className="file-input file-input-bordered w-full"
-                            {...register("image", { required: "A imagem é obrigatória" })}
+                            {...register("image", { required: method === "POST" ? "A imagem é obrigatória" : false})}
                             onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
