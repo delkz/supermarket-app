@@ -10,4 +10,5 @@ export interface Product {
     description?: string
     image?: string // base64
     brandId: string
+    brand?: Brand
 }

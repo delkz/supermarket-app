@@ -55,10 +55,10 @@ export default function Home() {
   }, [search])
 
   return (
-    <main className="p-6">
+    <main className="p-6 w-full container mx-auto">
       <h1 className="text-3xl font-bold mb-6">📃 Lista de Produtos</h1>
 
-      <div className="form-control mb-6 w-full max-w-sm flex gap-5">
+      <div className="form-control mb-6 w-full max-w-sm flex gap-5 ">
         <input
           type="text"
           placeholder="Buscar por nome, descrição ou marca..."
