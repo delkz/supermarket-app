@@ -1,10 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
-import { Product, Brand } from "@/types"
+
+import { Brand, Product } from "@/types"
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import FormFeedback from "./FormFeedback";
-type FormValues = Product;
+import { convertToBase64 } from "@/utils/convertToBase64";
+
+interface FormValues extends Omit<Product, 'image'> {
+    image: FileList;
+}
+  
 
 interface requestParams {
     data: Brand[];
@@ -14,42 +20,43 @@ interface requestParams {
 }
 
 export default function ProductForm() {
-    const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
-    const [brands, SetBrands] = useState<Brand[]>([]);
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
+    const [brands, setBrands] = useState<Brand[]>([]);
     const [formState, setFormState] = useState<"idle" | "success" | "error">("idle");
     const [formMessage, setFormMessage] = useState<string>("");
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchBrands = async () => {
-            const res = await fetch(`/api/brands?page=1&limit=999`);
-            const { data }: requestParams = await res.json();
-            SetBrands(data);
+            try {
+                const res = await fetch(`/api/brands?page=1&limit=999`);
+                const { data }: requestParams = await res.json();
+                setBrands(data);
+            } catch (error) {
+                console.error("Erro ao buscar marcas", error);
+            }
         };
 
         fetchBrands();
-    }, [])
+    }, []);
 
 
     const onSubmit: SubmitHandler<FormValues> = async (values) => {
-
+        setIsSubmitting(true);
         const { name, brandId, description, price, image } = values;
 
         if (!image || image.length === 0) {
-            alert("Selecione uma imagem");
+            setFormState("error");
+            setFormMessage("A imagem é obrigatória.");
+            setIsSubmitting(false);
             return;
-        }
+          }
 
         let base64Image = "";
 
         const file = image[0];
-        base64Image = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = (error) => reject(error);
-            reader.readAsDataURL(file);
-        });
-
-
+        base64Image = await convertToBase64(file);
         const raw = JSON.stringify({ name, brandId, description, price, image: base64Image });
 
         const requestOptions = {
@@ -60,16 +67,20 @@ export default function ProductForm() {
         const r = await fetch('/api/products', requestOptions)
         const response = await r.json();
 
+        setIsSubmitting(false);
+
         if (r.ok) {
             setFormState("success");
             setFormMessage("Produto cadastrado com sucesso!");
+            setImagePreview(null);
+            reset();
         } else {
             setFormState("error");
             setFormMessage(response.message || "Ocorreu um erro ao cadastrar o produto.");
         }
 
 
-        console.log({ response });
+        // console.log({ response });
     };
 
     return (
@@ -150,33 +161,29 @@ export default function ProductForm() {
                                 const file = e.target.files?.[0];
                                 if (file) {
                                     const reader = new FileReader();
-                                    reader.onload = () => {
-                                        const preview = document.getElementById("image-preview") as HTMLImageElement;
-                                        if (preview) {
-                                            preview.src = reader.result as string;
-                                        }
-                                    };
+                                    reader.onload = () => setImagePreview(reader.result as string);
                                     reader.readAsDataURL(file);
                                 }
                             }}
                         />
                         {errors.image && <span className="text-error">{errors.image.message}</span>}
                         <div className="mt-4">
+                            {imagePreview && (
+                                <img
+                                    src={imagePreview}
+                                    alt="Pré-visualização da imagem"
+                                    className="w-full h-64 object-scale-down bg-white"
+                                />
+                            )}
 
-                            <img
-                                id="image-preview"
-                                alt="Pré-visualização da imagem"
-                                className="w-full h-64 object-scale-down bg-white"
-                                style={{ display: "none" }}
-                                onLoad={(e) => (e.currentTarget.style.display = "block")}
-                                onError={(e) => (e.currentTarget.style.display = "none")}
-                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button type="submit" className="btn btn-primary w-full">Cadastrar</button>
+            <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Enviando..." : "Cadastrar"}
+            </button>
 
             {(formState !== "idle" && formMessage) && <FormFeedback text={formMessage} type={formState} />}
 
