@@ -201,7 +201,7 @@ export default function ProductForm({method,productId}:ProductFormProps) {
                 </div>
                 <div>
                     <div>
-                        <label className="label">
+                        <label className="label" htmlFor="image" aria-labelledby="image">
                             <span className="label-text">Imagem do Produto</span>
                         </label>
                         <input
