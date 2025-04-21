@@ -1,3 +1,4 @@
+import ProductDeleteButton from "@/components/ProductDeleteButton";
 import ProductForm from "@/components/ProductForm";
 
 
@@ -19,6 +20,7 @@ export default async function ProdutPage({
 
         <div className="form-control mb-6 ">
             <ProductForm method={"PUT"} productId={id} />
+            <ProductDeleteButton productId={id}/>
         </div>
     </main>
 }
