@@ -12,6 +12,9 @@ O Banco de dados não é real e utiliza um sistema simples de json no lugar.
 - Upload e preview da imagem do produto
 - Criação de marcas
 
+## Decisões de Desenvolvimento
+
+Optei por não utilizar muitas bibliotecas externas, como o Axios, para agilizar o desenvolvimento e manter o código mais simples e fácil de entender.
 
 ## Tecnologias Utilizadas
 
